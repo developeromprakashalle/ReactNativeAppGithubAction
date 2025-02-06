@@ -1,4 +1,4 @@
-name: Build React Native App
+name: Conditional Android & iOS Build
 
 on:
   workflow_dispatch:
