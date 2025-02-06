@@ -43,3 +43,5 @@ jobs:
           name: ReactNativeAndroid-build
           path: |
             android/app/build/outputs/apk/release/app-release.apk
+            ##./gradlew assembleDebug
+
