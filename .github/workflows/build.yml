@@ -30,7 +30,8 @@ jobs:
 
       - name: Build Android APK
         run: |
-          cd android  ./gradlew assembleRelease bundleRelease
+          cd android 
+          ./gradlew assembleRelease bundleRelease
 
       - name: Upload APK & AAB
         uses: actions/upload-artifact@v4
