@@ -10,7 +10,7 @@ on:
 
 jobs:
   android-build:
-    name: Build Android APK/AAB
+    name: Build Android APK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -33,10 +33,10 @@ jobs:
           cd android 
           ./gradlew assembleRelease bundleRelease
 
-      - name: Upload APK & AAB
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: android-build
+          name: ReactNativeAndroid-build
           path: |
             android/app/build/outputs/apk/release/app-release.apk
 
