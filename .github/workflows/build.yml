@@ -1,69 +1,51 @@
-name: React Native iOS Build
+name: Conditional Android build
 
 on:
-  workflow_dispatch: # Allows manual trigger
+  workflow_dispatch:
     inputs:
-      scheme:
-        description: 'Xcode Scheme Name'
+      platform:
+        description: 'Choose platform to build'
         required: true
-        default: 'ReactNativeGitActions'
-        type: string
-      configuration:
-        description: 'Build Configuration (Debug/Release)'
-        required: true
-        default: 'Release'
+        default: 'both'
         type: choice
         options:
-          - Debug
-          - Release
-
-jobs:
-  ios-build:
-    name: Build React Native iOS App
-    runs-on: macos-latest # Required for iOS builds
-
+          - Android
+          - iOS
+          - both
+	  
+	android-build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    if: inputs.platform == 'Android' || inputs.platform == 'both'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Set Up Node.js
-        uses: actions/setup-node@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          node-version: 18 # Adjust based on project
+          distribution: 'zulu'
+          java-version: '17'
 
-      - name: Install Dependencies
+      - name: Install Node.js dependencies
         run: |
-          rm -rf node_modules package-lock.json yarn.lock
-          yarn install
+          npm install
 
-      - name: Install CocoaPods (For iOS)
+      - name: Set up Gradle Cache
+        uses: gradle/gradle-build-action@v2
+
+      - name: Grant Execute Permission to Gradle Wrapper
+        run: chmod +x android/gradlew
+
+      - name: Build Android APK
         run: |
-          cd ios
-          pod install --repo-update
-          cd ..
+          cd android 
+          ./gradlew assembleRelease bundleRelease
 
-      - name: Set Up Xcode
-        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-
-      - name: Build iOS App
-        run: |
-          cd ios
-          xcodebuild -workspace ReactNativeGitActions.xcworkspace \
-            -scheme ${{ inputs.scheme }} \
-            -sdk iphoneos \
-            -configuration ${{ inputs.configuration }} \
-            -archivePath build/ReactNativeGitActions.xcarchive archive
-
-      - name: Export IPA File
-        run: |
-          cd ios
-          xcodebuild -exportArchive \
-            -archivePath build/ReactNativeGitActions.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath build
-
-      - name: Upload iOS Build
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ReactNativeiOSBuild
-          path: ios/build/*.ipa
+          name: ReactNativeAndroid-build
+          path: |
+            android/app/build/outputs/apk/release/app-release.apk
+            ##./gradlew assembleDebug
