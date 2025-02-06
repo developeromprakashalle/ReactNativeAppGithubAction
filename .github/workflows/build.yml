@@ -1,67 +1,69 @@
-name: Conditional Android & iOS Build
+name: React Native iOS Build
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-      
- # workflow_dispatch:
-  #  inputs:
-  #    platform:
-  #      description: "Choose platform to build (Android / iOS / both)"
-  #      required: true
-  #      default: 'both'
-  #	type: string       
+  workflow_dispatch: # Allows manual trigger
+    inputs:
+      scheme:
+        description: 'Xcode Scheme Name'
+        required: true
+        default: 'ReactNativeGitActions'
+        type: string
+      configuration:
+        description: 'Build Configuration (Debug/Release)'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - Debug
+          - Release
 
 jobs:
   ios-build:
-    name: Build iOS IPA
-    runs-on: macos-latest
+    name: Build React Native iOS App
+    runs-on: macos-latest # Required for iOS builds
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set Up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: "22"  # Adjust based on project
-          cache: "npm"
+          node-version: 18 # Adjust based on project
 
       - name: Install Dependencies
         run: |
           rm -rf node_modules package-lock.json yarn.lock
-          npm install
+          yarn install
 
-      - name: Set up Xcode
-        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-
-      - name: Install CocoaPods
+      - name: Install CocoaPods (For iOS)
         run: |
           cd ios
           pod install --repo-update
+          cd ..
 
-      - name: Build iOS IPA
+      - name: Set Up Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+      - name: Build iOS App
         run: |
           cd ios
-          xcodebuild -workspace ReactNativeAppGithubAction.xcworkspace \
-            -scheme YourScheme \
+          xcodebuild -workspace ReactNativeGitActions.xcworkspace \
+            -scheme ${{ inputs.scheme }} \
             -sdk iphoneos \
-            -configuration Release \
-            -archivePath build/ReactNativeAppGithubAction.xcarchive archive
+            -configuration ${{ inputs.configuration }} \
+            -archivePath build/ReactNativeGitActions.xcarchive archive
 
-      - name: Export IPA
+      - name: Export IPA File
         run: |
           cd ios
           xcodebuild -exportArchive \
-            -archivePath build/ReactNativeAppGithubAction.xcarchive \
-            -exportPath build \
-            -exportOptionsPlist exportOptions.plist
+            -archivePath build/ReactNativeGitActions.xcarchive \
+            -exportOptionsPlist exportOptions.plist \
+            -exportPath build
 
-      - name: Upload iOS IPA
+      - name: Upload iOS Build
         uses: actions/upload-artifact@v4
         with:
-          name: ReactNativeiOS-build
+          name: ReactNativeiOSBuild
           path: ios/build/*.ipa
