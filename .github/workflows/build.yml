@@ -10,7 +10,7 @@ on:
 
   workflow_dispatch:
     inputs:
-      platform:'Android'
+      platform:
         description: "Choose platform to build (Android / iOS / both)"
         required: true
         default: 'both'
