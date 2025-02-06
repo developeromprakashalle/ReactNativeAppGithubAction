@@ -14,11 +14,7 @@ on:
         description: "Choose platform to build (Android / iOS / both)"
         required: true
         default: 'both'
-	type: choice
-        options:
-          - Android
-          - iOS
-          - both
+	type: string       
 
 jobs:
   android-build:
