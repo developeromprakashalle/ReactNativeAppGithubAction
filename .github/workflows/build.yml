@@ -46,17 +46,17 @@ jobs:
       - name: Build iOS IPA
         run: |
           cd ios
-          xcodebuild -workspace YourProject.xcworkspace \
+          xcodebuild -workspace ReactNativeAppGithubAction.xcworkspace \
             -scheme YourScheme \
             -sdk iphoneos \
             -configuration Release \
-            -archivePath build/YourApp.xcarchive archive
+            -archivePath build/ReactNativeAppGithubAction.xcarchive archive
 
       - name: Export IPA
         run: |
           cd ios
           xcodebuild -exportArchive \
-            -archivePath build/YourApp.xcarchive \
+            -archivePath build/ReactNativeAppGithubAction.xcarchive \
             -exportPath build \
             -exportOptionsPlist exportOptions.plist
 
