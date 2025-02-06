@@ -18,8 +18,6 @@ on:
 
 jobs:
   android-build:
-  - name: Platform Input
-    run: echo "Platform selected: ${{ inputs.platform }}"
     name: Build Android APK
     runs-on: ubuntu-latest
     if: inputs.platform == 'Android' || inputs.platform == 'both'
