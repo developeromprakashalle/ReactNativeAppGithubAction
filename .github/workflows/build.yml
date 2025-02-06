@@ -8,10 +8,19 @@ on:
     branches:
       - main
 
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Choose platform to build (Android / iOS / both)'
+        required: true
+        default: 'both'
+        type: string
+
 jobs:
   android-build:
     name: Build Android APK
     runs-on: ubuntu-latest
+    if: inputs.platform == 'Android' || inputs.platform == 'both'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
