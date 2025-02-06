@@ -12,8 +12,8 @@ on:
           - Android
           - iOS
           - both
-	  
-	android-build:
+jobs:
+  android-build:
     name: Build Android APK
     runs-on: ubuntu-latest
     if: inputs.platform == 'Android' || inputs.platform == 'both'
