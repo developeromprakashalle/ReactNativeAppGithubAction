@@ -10,7 +10,7 @@ on:
 
 jobs:
   android-build:
-    name: Build Android APK
+    name: Build Android APK/AAB
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -25,19 +25,21 @@ jobs:
       - name: Set up Gradle Cache
         uses: gradle/gradle-build-action@v2
 
-      - name: Build Android APK
+      - name: Build Android APK & AAB
         run: |
           cd android
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease bundleRelease
 
-      - name: Upload APK
+      - name: Upload APK & AAB
         uses: actions/upload-artifact@v3
         with:
-          name: ReactNative-Android
-          path: android/app/build/outputs/apk/release/app-release.apk
+          name: android-build
+          path: |
+            android/app/build/outputs/apk/release/app-release.apk
+            android/app/build/outputs/bundle/release/app-release.aab
 
   ios-build:
-    name: Build iOS App
+    name: Build iOS IPA
     runs-on: macos-latest
     steps:
       - name: Checkout Repository
@@ -49,15 +51,27 @@ jobs:
       - name: Install CocoaPods
         run: |
           cd ios
-          pod install
+          pod install --repo-update
 
-      - name: Build iOS App
+      - name: Build iOS IPA
         run: |
           cd ios
-          xcodebuild -workspace YourProject.xcworkspace -scheme YourScheme -sdk iphoneos -configuration Release build
+          xcodebuild -workspace YourProject.xcworkspace \
+            -scheme YourScheme \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath build/YourApp.xcarchive archive
 
-      - name: Upload iOS Build
+      - name: Export IPA
+        run: |
+          cd ios
+          xcodebuild -exportArchive \
+            -archivePath build/YourApp.xcarchive \
+            -exportPath build \
+            -exportOptionsPlist exportOptions.plist
+
+      - name: Upload iOS IPA
         uses: actions/upload-artifact@v3
         with:
-          name: ReactNative-iOS
-          path: ios/build
+          name: ios-build
+          path: ios/build/*.ipa
