@@ -22,7 +22,18 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"  # Adjust based on project
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          rm -rf node_modules package-lock.json yarn.lock
+          npm install
 
       - name: Set up Xcode
         run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
